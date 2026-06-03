@@ -1133,6 +1133,13 @@ impl VcpuFd {
     /// if kvm.check_extension(Cap::VcpuEvents) {
     ///     let vm = kvm.create_vm().unwrap();
     ///     let vcpu = vm.create_vcpu(0).unwrap();
+    ///     // On arm64, vCPU needs to be initialized before accesing events
+    ///     #[cfg(target_arch = "aarch64")]
+    ///     {
+    ///         let mut kvi = kvm_bindings::kvm_vcpu_init::default();
+    ///         vm.get_preferred_target(&mut kvi).unwrap();
+    ///         vcpu.vcpu_init(&kvi).unwrap();
+    ///     }
     ///     let vcpu_events = vcpu.get_vcpu_events().unwrap();
     /// }
     /// ```
@@ -1164,6 +1171,13 @@ impl VcpuFd {
     /// if kvm.check_extension(Cap::VcpuEvents) {
     ///     let vm = kvm.create_vm().unwrap();
     ///     let vcpu = vm.create_vcpu(0).unwrap();
+    ///     // On arm64, vCPU needs to be initialized before accesing events
+    ///     #[cfg(target_arch = "aarch64")]
+    ///     {
+    ///         let mut kvi = kvm_bindings::kvm_vcpu_init::default();
+    ///         vm.get_preferred_target(&mut kvi).unwrap();
+    ///         vcpu.vcpu_init(&kvi).unwrap();
+    ///     }
     ///     let vcpu_events = Default::default();
     ///     // Your `vcpu_events` manipulation here.
     ///     vcpu.set_vcpu_events(&vcpu_events).unwrap();
@@ -2445,6 +2459,14 @@ mod tests {
         if kvm.check_extension(Cap::VcpuEvents) {
             let vm = kvm.create_vm().unwrap();
             let vcpu = vm.create_vcpu(0).unwrap();
+
+            #[cfg(target_arch = "aarch64")]
+            {
+                let mut kvi = kvm_vcpu_init::default();
+                vm.get_preferred_target(&mut kvi).unwrap();
+                vcpu.vcpu_init(&kvi).unwrap();
+            }
+
             let vcpu_events = vcpu.get_vcpu_events().unwrap();
             vcpu.set_vcpu_events(&vcpu_events).unwrap();
             let other_vcpu_events = vcpu.get_vcpu_events().unwrap();
