@@ -3,6 +3,7 @@
 
 //! Rust FFI bindings to KVM, generated using [bindgen](https://crates.io/crates/bindgen).
 
+#![allow(confusable_idents)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
